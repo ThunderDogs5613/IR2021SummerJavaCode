@@ -4,6 +4,8 @@
 
 package frc.robot;
    
+import java.lang.Math;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;   //include vendor libraries
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -83,6 +85,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3); //set LED's to forced on
     // The angle offset to the target on the horizontal axis.
     double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
     // The angle offset to the target on the vertical axis.
@@ -146,6 +149,8 @@ public class Robot extends TimedRobot {
         shooterIntake.set(-1);
         carousel.set(.32);
         ballsHaveBeenShot = true;
+        NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0); //set limelight LED's to default pipeline setting (generally off)
+
       }
       else if (time >= 5 && time < 6) {
         
@@ -220,6 +225,8 @@ public class Robot extends TimedRobot {
 
 //Drive control
     if (buttonPad.getRawButton(1)) {
+      
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3); //set LED's to forced on
       // The angle offset to the target on the horizontal axis.
       double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
       // The angle offset to the target on the vertical axis.
@@ -264,8 +271,13 @@ public class Robot extends TimedRobot {
       brDrive.set(ControlMode.PercentOutput, right);
     }
     else {
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0); //set limelight LED's to default pipeline setting (generally off)
+
       double speed = driveStick.getY();
-      double turn = driveStick.getZ() * -.4;
+      double turn = driveStick.getZ() * -.7;
+
+      speed = speed * Math.abs(speed);
+      turn = turn * Math.abs(turn);
 
       double left = speed + turn;
       double right = speed - turn;
