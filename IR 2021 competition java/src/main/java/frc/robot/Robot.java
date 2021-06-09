@@ -3,11 +3,11 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
-import edu.wpi.first.wpilibj.TimedRobot;
-import com.ctre.phoenix.motorcontrol.ControlMode;
+   
+import com.ctre.phoenix.motorcontrol.ControlMode;   //include vendor libraries
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.TimedRobot;  //include WPILib libraries
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.Spark;
