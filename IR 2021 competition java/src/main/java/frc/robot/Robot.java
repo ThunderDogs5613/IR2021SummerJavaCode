@@ -270,6 +270,9 @@ public class Robot extends TimedRobot {
       double left = speed + turn;
       double right = speed - turn;
 
+      left = left * left * left;   //cube output speed and keep negative control intact
+      right = right * right * right;  //Gives more control area to the smaller, more precise movements while not scarificing the max speed
+
       flDrive.set(ControlMode.PercentOutput, left);
       blDrive.set(ControlMode.PercentOutput, left);
       frDrive.set(ControlMode.PercentOutput, right);
