@@ -212,8 +212,12 @@ public class Robot extends TimedRobot {
     if (buttonPad.getRawButton(2))  {winch.set(-1);}  //WINCH MUST ONLY SPIN BACKWARDS to save the motor and built in ratchet
     else {winch.set(0);}
 //Control Panel (CP) Spinner
-    if (povButtonUp.get()) {}
-//TODO: complete commands for cpSpinner
+    if (povButtonUp.get()) {CPSpinnerActuator.set(kReverse);} //raises motor. Is held ther until the "down" button is pressed
+    if (povButtonDown.get()) {CPSpinnerActuator.set(kForward);} //this is the down config and starting. only returns to this pos when button is pressed
+    if (povButtonLeft.get()) {CPSpinner.set(-.2);}  //spin left
+    else if (povButtonRight.get()) {CPSpinner.set(.2);} //spin right
+    else {CPSpinner.set(0);}  //default state
+
 //Drive control
     if (buttonPad.getRawButton(1)) {
       // The angle offset to the target on the horizontal axis.
