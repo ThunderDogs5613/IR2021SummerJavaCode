@@ -35,7 +35,7 @@ public class Robot extends TimedRobot {
   Joystick driveStick = new Joystick(0);  //joystick setup
   Joystick buttonPad = new Joystick(1); 
 
-  POVButton povButtonUp = new POVButton(driveStick, 0);
+  POVButton povButtonUp = new POVButton(driveStick, 0);   //setup POV buttons. "0" is the angle position as if on a circle
   POVButton povButtonDown = new POVButton(driveStick, 180);
   POVButton povButtonLeft = new POVButton(driveStick, 270);
   POVButton povButtonRight = new POVButton(driveStick, 90);
