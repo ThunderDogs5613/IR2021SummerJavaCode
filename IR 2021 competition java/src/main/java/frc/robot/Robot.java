@@ -4,6 +4,8 @@
 
 package frc.robot;
    
+import java.lang.Math;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;   //include vendor libraries
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -272,7 +274,10 @@ public class Robot extends TimedRobot {
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0); //set limelight LED's to default pipeline setting (generally off)
 
       double speed = driveStick.getY();
-      double turn = driveStick.getZ() * -.4;
+      double turn = driveStick.getZ() * -.7;
+
+      speed = speed * Math.abs(speed);
+      turn = turn * Math.abs(turn);
 
       double left = speed + turn;
       double right = speed - turn;
