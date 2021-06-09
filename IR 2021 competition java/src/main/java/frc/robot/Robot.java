@@ -40,12 +40,12 @@ public class Robot extends TimedRobot {
   POVButton povButtonLeft = new POVButton(driveStick, 270);
   POVButton povButtonRight = new POVButton(driveStick, 90);
   
-  TalonSRX FLDrive = new TalonSRX(0);   //setup drive motors; talons via CAN
-  TalonSRX BLDrive = new TalonSRX(1);
-  TalonSRX FRDrive = new TalonSRX(2);
-  TalonSRX BRDrive = new TalonSRX(3);
+  TalonSRX flDrive = new TalonSRX(0);   //setup drive motors; talons via CAN
+  TalonSRX blDrive = new TalonSRX(1);
+  TalonSRX frDrive = new TalonSRX(2);
+  TalonSRX brDrive = new TalonSRX(3);
 
-  Spark CPSpinner = new Spark(1);             //setup spark/sparkMax controllers 
+  Spark cpSpinner = new Spark(1);             //setup spark/sparkMax controllers 
   PWMSparkMax winch = new PWMSparkMax(2);
   PWMSparkMax flyWheel = new PWMSparkMax(3);
   Spark intakeRollers = new Spark(4);
@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
 
   Compressor compressor;   //setup pnuematics
   DoubleSolenoid shooterIntakeActuator = new DoubleSolenoid(0,1);
-  DoubleSolenoid CPSpinnerActuator = new DoubleSolenoid(2,3);
+  DoubleSolenoid cpSpinnerActuator = new DoubleSolenoid(2,3);
 
   Timer shootDelayTimer = new Timer(); //setup various timers
 
@@ -69,8 +69,8 @@ public class Robot extends TimedRobot {
 
     CameraServer.getInstance().startAutomaticCapture();
 
-    FLDrive.setInverted(true);
-    BLDrive.setInverted(true);
+    flDrive.setInverted(true);
+    blDrive.setInverted(true);
   }
 
   @Override
@@ -122,10 +122,10 @@ public class Robot extends TimedRobot {
     double right = yOutputSpeed + xOutputSpeed;
 
     //motor output
-    FLDrive.set(ControlMode.PercentOutput, left);
-    BLDrive.set(ControlMode.PercentOutput, left);
-    FRDrive.set(ControlMode.PercentOutput, right);
-    BRDrive.set(ControlMode.PercentOutput, right);
+    flDrive.set(ControlMode.PercentOutput, left);
+    blDrive.set(ControlMode.PercentOutput, left);
+    frDrive.set(ControlMode.PercentOutput, right);
+    brDrive.set(ControlMode.PercentOutput, right);
       }
        else if (ballsHaveBeenShot == true) {
 
@@ -138,10 +138,10 @@ public class Robot extends TimedRobot {
       shootDelayTimer.start();
       flyWheel.set(0.62);
       if (time >= 1 && time <=5) {
-        FLDrive.set(ControlMode.PercentOutput, 0);
-        BLDrive.set(ControlMode.PercentOutput, 0);
-        FRDrive.set(ControlMode.PercentOutput, 0);
-        BRDrive.set(ControlMode.PercentOutput, 0);
+        flDrive.set(ControlMode.PercentOutput, 0);
+        blDrive.set(ControlMode.PercentOutput, 0);
+        frDrive.set(ControlMode.PercentOutput, 0);
+        brDrive.set(ControlMode.PercentOutput, 0);
         shooterIntakeActuator.set(kReverse); //extend actuator; down pos
         shooterIntake.set(-1);
         carousel.set(.32);
@@ -153,24 +153,24 @@ public class Robot extends TimedRobot {
         shooterIntake.set(0);
         carousel.set(0);
         flyWheel.set(0);
-        FRDrive.set(ControlMode.PercentOutput, -.2);
-        BRDrive.set(ControlMode.PercentOutput, -.2);
+        frDrive.set(ControlMode.PercentOutput, -.2);
+        brDrive.set(ControlMode.PercentOutput, -.2);
       }
       else if (time >=6 && time <8) {
-        FLDrive.set(ControlMode.PercentOutput, 0);
-        BLDrive.set(ControlMode.PercentOutput, 0);
-        FRDrive.set(ControlMode.PercentOutput, 0);
-        BRDrive.set(ControlMode.PercentOutput, 0);}
-        /*FLDrive.set(ControlMode.PercentOutput, -.4);
-        BLDrive.set(ControlMode.PercentOutput, -.4);
-        FRDrive.set(ControlMode.PercentOutput, -.4);
-        BRDrive.set(ControlMode.PercentOutput, -.4);
+        flDrive.set(ControlMode.PercentOutput, 0);
+        blDrive.set(ControlMode.PercentOutput, 0);
+        frDrive.set(ControlMode.PercentOutput, 0);
+        brDrive.set(ControlMode.PercentOutput, 0);}
+        /*flDrive.set(ControlMode.PercentOutput, -.4);
+        blDrive.set(ControlMode.PercentOutput, -.4);
+        frDrive.set(ControlMode.PercentOutput, -.4);
+        brDrive.set(ControlMode.PercentOutput, -.4);
       }
       else if (time >= 9) {
-        FLDrive.set(ControlMode.PercentOutput, 0);
-        BLDrive.set(ControlMode.PercentOutput, 0);
-        FRDrive.set(ControlMode.PercentOutput, 0);
-        BRDrive.set(ControlMode.PercentOutput, 0);
+        flDrive.set(ControlMode.PercentOutput, 0);
+        blDrive.set(ControlMode.PercentOutput, 0);
+        frDrive.set(ControlMode.PercentOutput, 0);
+        brDrive.set(ControlMode.PercentOutput, 0);
       }*/
     }
     
@@ -212,11 +212,11 @@ public class Robot extends TimedRobot {
     if (buttonPad.getRawButton(2))  {winch.set(-1);}  //WINCH MUST ONLY SPIN BACKWARDS to save the motor and built in ratchet
     else {winch.set(0);}
 //Control Panel (CP) Spinner
-    if (povButtonUp.get()) {CPSpinnerActuator.set(kReverse);} //raises motor. Is held ther until the "down" button is pressed
-    if (povButtonDown.get()) {CPSpinnerActuator.set(kForward);} //this is the down config and starting. only returns to this pos when button is pressed
-    if (povButtonLeft.get()) {CPSpinner.set(-.2);}  //spin left
-    else if (povButtonRight.get()) {CPSpinner.set(.2);} //spin right
-    else {CPSpinner.set(0);}  //default state
+    if (povButtonUp.get()) {cpSpinnerActuator.set(kReverse);} //raises motor. Is held ther until the "down" button is pressed
+    if (povButtonDown.get()) {cpSpinnerActuator.set(kForward);} //this is the down config and starting. only returns to this pos when button is pressed
+    if (povButtonLeft.get()) {cpSpinner.set(-.2);}  //spin left
+    else if (povButtonRight.get()) {cpSpinner.set(.2);} //spin right
+    else {cpSpinner.set(0);}  //default state
 
 //Drive control
     if (buttonPad.getRawButton(1)) {
@@ -258,10 +258,10 @@ public class Robot extends TimedRobot {
       double right = yOutputSpeed + xOutputSpeed;
 
       //motor output
-      FLDrive.set(ControlMode.PercentOutput, left);
-      BLDrive.set(ControlMode.PercentOutput, left);
-      FRDrive.set(ControlMode.PercentOutput, right);
-      BRDrive.set(ControlMode.PercentOutput, right);
+      flDrive.set(ControlMode.PercentOutput, left);
+      blDrive.set(ControlMode.PercentOutput, left);
+      frDrive.set(ControlMode.PercentOutput, right);
+      brDrive.set(ControlMode.PercentOutput, right);
     }
     else {
       double speed = driveStick.getY();
@@ -270,10 +270,10 @@ public class Robot extends TimedRobot {
       double left = speed + turn;
       double right = speed - turn;
 
-      FLDrive.set(ControlMode.PercentOutput, left);
-      BLDrive.set(ControlMode.PercentOutput, left);
-      FRDrive.set(ControlMode.PercentOutput, right);
-      BRDrive.set(ControlMode.PercentOutput, right);
+      flDrive.set(ControlMode.PercentOutput, left);
+      blDrive.set(ControlMode.PercentOutput, left);
+      frDrive.set(ControlMode.PercentOutput, right);
+      brDrive.set(ControlMode.PercentOutput, right);
     }
   
   
