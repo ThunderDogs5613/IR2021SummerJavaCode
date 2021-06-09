@@ -83,6 +83,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3); //set LED's to forced on
     // The angle offset to the target on the horizontal axis.
     double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
     // The angle offset to the target on the vertical axis.
@@ -146,6 +147,8 @@ public class Robot extends TimedRobot {
         shooterIntake.set(-1);
         carousel.set(.32);
         ballsHaveBeenShot = true;
+        NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0); //set limelight LED's to default pipeline setting (generally off)
+
       }
       else if (time >= 5 && time < 6) {
         
@@ -220,6 +223,8 @@ public class Robot extends TimedRobot {
 
 //Drive control
     if (buttonPad.getRawButton(1)) {
+      
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3); //set LED's to forced on
       // The angle offset to the target on the horizontal axis.
       double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
       // The angle offset to the target on the vertical axis.
@@ -264,14 +269,13 @@ public class Robot extends TimedRobot {
       brDrive.set(ControlMode.PercentOutput, right);
     }
     else {
+      NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0); //set limelight LED's to default pipeline setting (generally off)
+
       double speed = driveStick.getY();
       double turn = driveStick.getZ() * -.4;
 
       double left = speed + turn;
       double right = speed - turn;
-
-      left = left * left * left;   //cube output speed and keep negative control intact
-      right = right * right * right;  //Gives more control area to the smaller, more precise movements while not scarificing the max speed
 
       flDrive.set(ControlMode.PercentOutput, left);
       blDrive.set(ControlMode.PercentOutput, left);
