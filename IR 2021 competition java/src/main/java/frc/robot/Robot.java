@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.buttons.POVButton;
+
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import edu.wpi.first.cameraserver.CameraServer;
 
@@ -33,6 +35,11 @@ public class Robot extends TimedRobot {
   Joystick driveStick = new Joystick(0);  //joystick setup
   Joystick buttonPad = new Joystick(1); 
 
+  POVButton povButtonUp = new POVButton(driveStick, 0);
+  POVButton povButtonDown = new POVButton(driveStick, 180);
+  POVButton povButtonLeft = new POVButton(driveStick, 270);
+  POVButton povButtonRight = new POVButton(driveStick, 90);
+  
   TalonSRX FLDrive = new TalonSRX(0);   //setup drive motors; talons via CAN
   TalonSRX BLDrive = new TalonSRX(1);
   TalonSRX FRDrive = new TalonSRX(2);
@@ -205,8 +212,8 @@ public class Robot extends TimedRobot {
     if (buttonPad.getRawButton(2))  {winch.set(-1);}  //WINCH MUST ONLY SPIN BACKWARDS to save the motor and built in ratchet
     else {winch.set(0);}
 //Control Panel (CP) Spinner
-    //if (buttonPad.getRawPOV)?????????
-
+    if (povButtonUp.get()) {}
+//TODO: complete commands for cpSpinner
 //Drive control
     if (buttonPad.getRawButton(1)) {
       // The angle offset to the target on the horizontal axis.
