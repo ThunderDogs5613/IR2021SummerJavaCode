@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
    */
   Joystick driveStick = new Joystick(0);  //joystick setup
   Joystick buttonPad = new Joystick(1); 
+  Joystick winchReleaseStick = new Joystick(2);
 
   POVButton povButtonUp = new POVButton(driveStick, 0);   //setup POV buttons. "0" is the angle position as if on a circle
   POVButton povButtonDown = new POVButton(driveStick, 180);
@@ -47,12 +48,12 @@ public class Robot extends TimedRobot {
   TalonSRX frDrive = new TalonSRX(2);
   TalonSRX brDrive = new TalonSRX(3);
 
-  Spark cpSpinner = new Spark(1);             //setup spark/sparkMax controllers 
+  Spark telescope = new Spark(1);             //setup spark/sparkMax controllers 
   PWMSparkMax winch = new PWMSparkMax(2);
   PWMSparkMax flyWheel = new PWMSparkMax(3);
   Spark intakeRollers = new Spark(4);
   Spark intakeArm = new Spark(5);
-  Spark telescope = new Spark(6);
+  Spark cpSpinner = new Spark(6);
   Spark carousel = new Spark(7);
   Spark shooterIntake = new Spark(8);
   Spark blinkin = new Spark(9);   //setup Blinkin LED Strip controller. Yes it uses the spark class.
@@ -215,6 +216,7 @@ public class Robot extends TimedRobot {
       shooterIntake.set(0);}
 // climber winch
     if (buttonPad.getRawButton(2))  {winch.set(-1);}  //WINCH MUST ONLY SPIN BACKWARDS to save the motor and built in ratchet
+    else if (winchReleaseStick.getRawButton(1)) {winch.set(1);}  //winch release mechanism
     else {winch.set(0);}
 //Control Panel (CP) Spinner
     if (povButtonUp.get()) {cpSpinnerActuator.set(kReverse);} //raises motor. Is held ther until the "down" button is pressed
