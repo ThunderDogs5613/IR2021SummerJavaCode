@@ -70,6 +70,8 @@ public class Robot extends TimedRobot {
   double xLastError = 0;
   double yLastError = 0;
   
+  int buttonIsHeld = 0;
+  
   @Override
   public void robotInit() {
 
@@ -234,7 +236,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit () {
+    buttonIsHeld = 0;
+  }
 
   @Override
   public void teleopPeriodic() {
@@ -275,42 +279,94 @@ public class Robot extends TimedRobot {
     else if (povButtonRight.get()) {cpSpinner.set(.2);} //spin right
     else {cpSpinner.set(0);}  //default state
 
-//Drive control
+    // Checks if the button is being held to prevent repeated overwriting of time.
+    if (buttonIsHeld == 0 && buttonPad.getRawButton(1)) {
+      lastTimeStamp = Timer.getFPGATimestamp();
+      buttonIsHeld = 1;
+    } else if (buttonIsHeld == 1 && buttonPad.getRawButton(1)) {
+
+    } else {
+      buttonIsHeld = 0;
+    }
+
+    //Drive control
     if (buttonPad.getRawButton(1)) {
-      
+
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3); //set LED's to forced on
       // The angle offset to the target on the horizontal axis.
       double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
       // The angle offset to the target on the vertical axis.
       double ty = NetworkTableInstance.getDefault().getTable("limelight").getEntry("ty").getDouble(0);
-      // limelight x & y PD loop
+      
       //variable setup
+      // Constant for P
       double xKP = -0.1;
-      double xKD = 0.1;
+      // Constant for I
+      double xKI = 1;
+      // Constant for D
+      double xKD = 0.05;
+      // The point you want to get the robot to.
       double xSetpoint = 0;
-      double xLastError = 0;
-
+      double xILimit = 2;
+      
+      // Constant for P
       double yKP = -0.1;
-      double yKD = 0.1;
+      // Constant for I
+      double yKI = 1;
+      // Constant for D
+      double yKD = 0.05;
+      // The point which you want to get the robot to.
       double ySetpoint = 0;
-      double yLastError = 0;
+      double yILimit = 2;
 
-      double lastTimestamp = 0;
+      //calculations 
 
-      //calculations
-      double timeInterval = Timer.getFPGATimestamp() - lastTimestamp;
-
+      // Figures out how long the function has been running.
+      double timeInterval = Timer.getFPGATimestamp() - lastTimeStamp;
+      
+      //Finds the desired point by subtracting the current position from the set position
       double xError = xSetpoint - tx;
+      
+      //Finds the rate of change in error for use in the D portion of the PID loop.
       double xErrorRate = (xError - xLastError) / timeInterval;
-      double xOutputSpeed = xKP * xError + xKD * xErrorRate;
+      
+      // The I constant increases over time to allow the robot to overcome friction and move the last little bit to get to the desired point.
+      double xErrorSum = 0;
+      if (Math.abs(xError) < xILimit) {
+        xErrorSum = timeInterval * xError;
+      }
+      
+      // P, I, and D
+      double xP = xKP * xError;
+      double xI = xKI * xErrorSum;
+      double xD = xKD * xErrorRate;
+
+      // The final output speed
+      double xOutputSpeed = xP + xI + xD;
+      
+      // The error in x from the previous loop is used to calculate the rate of change in error.
       xLastError = xError;
 
+      // The error form the desired point
       double yError = ySetpoint - ty;
+      
+      // Rate of change in error
       double yErrorRate = (yError - yLastError) / timeInterval;
-      double yOutputSpeed = yKP * yError + yKD * yErrorRate;
-      yLastError = yError;
+      
+      // The I constant increases over time to allow the robot to overcome friction and move the last little bit to get to the desired point.
+      double yErrorSum = 0;
+      if (Math.abs(yError) < yILimit) {
+        yErrorSum = timeInterval * yError;
+      } 
+      
+      double yP = yKP * yError;
+      double yI = yKI * yErrorSum;
+      double yD = yKD * yErrorRate;
 
-      lastTimestamp = Timer.getFPGATimestamp();
+      // The final output speed is the sum of P, I, and D
+      double yOutputSpeed = yP + yI + yD;
+      
+      yLastError = yError;
 
       //combine x and y outputs
       double left = yOutputSpeed - xOutputSpeed;
