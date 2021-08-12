@@ -3,13 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-   
+
 import java.lang.Math;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;   //include vendor libraries
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
-import edu.wpi.first.wpilibj.TimedRobot;  //include WPILib libraries
+import edu.wpi.first.wpilibj.TimedRobot; //include WPILib libraries
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMSparkMax;
 import edu.wpi.first.wpilibj.Spark;
@@ -18,34 +15,33 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.buttons.POVButton;
+import frc.robot.subsystems.DriveTrain;
 
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 import edu.wpi.first.cameraserver.CameraServer;
 
-
 /**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to each mode, as described in the TimedRobot
+ * documentation. If you change the name of this class or the package after
+ * creating this project, you must also update the build.gradle file in the
  * project.
  */
 public class Robot extends TimedRobot {
   /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
+   * This function is run when the robot is first started up and should be used
+   * for any initialization code.
    */
-  Joystick driveStick = new Joystick(0);  //joystick setup
-  Joystick buttonPad = new Joystick(1); 
+  Joystick driveStick = new Joystick(0); // joystick setup
+  Joystick buttonPad = new Joystick(1);
 
-  POVButton povButtonUp = new POVButton(driveStick, 0);   //setup POV buttons. "0" is the angle position as if on a circle
+  POVButton povButtonUp = new POVButton(driveStick, 0); // setup POV buttons. "0" is the angle position as if on a
+                                                        // circle
   POVButton povButtonDown = new POVButton(driveStick, 180);
   POVButton povButtonLeft = new POVButton(driveStick, 270);
   POVButton povButtonRight = new POVButton(driveStick, 90);
-  
-  TalonSRX flDrive = new TalonSRX(0);   //setup drive motors; talons via CAN
-  TalonSRX blDrive = new TalonSRX(1);
-  TalonSRX frDrive = new TalonSRX(2);
-  TalonSRX brDrive = new TalonSRX(3);
+
+  DriveTrain drive = new DriveTrain();
 
   Spark cpSpinner = new Spark(1);             //setup spark/sparkMax controllers 
   PWMSparkMax winch = new PWMSparkMax(2);
@@ -74,11 +70,7 @@ public class Robot extends TimedRobot {
   
   @Override
   public void robotInit() {
-
     CameraServer.getInstance().startAutomaticCapture();
-
-    flDrive.setInverted(true);
-    blDrive.setInverted(true);
   }
 
   @Override
@@ -93,6 +85,14 @@ public class Robot extends TimedRobot {
     }
   @Override
   public void autonomousPeriodic() {
+    
+    /*if(shootDelayTimer.get()< 2) {
+      flDrive.set(ControlMode.PercentOutput, 0.5);
+      frDrive.set(ControlMode.PercentOutput, 0.5);
+      blDrive.set(ControlMode.PercentOutput, 0.5);
+      brDrive.set(ControlMode.PercentOutput, 0.5);   
+    }*/
+    
     
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3); //set LED's to forced on
     // The angle offset to the target on the horizontal axis.
@@ -179,10 +179,7 @@ public class Robot extends TimedRobot {
         double right = yOutputSpeed + xOutputSpeed;
 
         //motor output
-        flDrive.set(ControlMode.PercentOutput, left);
-        blDrive.set(ControlMode.PercentOutput, left);
-        frDrive.set(ControlMode.PercentOutput, right);
-        brDrive.set(ControlMode.PercentOutput, right);
+        drive.setPower(left, right);
       }
       else if (ballsHaveBeenShot == true) {
 
@@ -195,10 +192,7 @@ public class Robot extends TimedRobot {
       shootDelayTimer.start();
       flyWheel.set(0.62);
       if (time >= 1 && time <=5) {
-        flDrive.set(ControlMode.PercentOutput, 0);
-        blDrive.set(ControlMode.PercentOutput, 0);
-        frDrive.set(ControlMode.PercentOutput, 0);
-        brDrive.set(ControlMode.PercentOutput, 0);
+        drive.setPower(0,0);
         shooterIntakeActuator.set(kReverse); //extend actuator; down pos
         shooterIntake.set(-1);
         carousel.set(.32);
@@ -212,27 +206,24 @@ public class Robot extends TimedRobot {
         shooterIntake.set(0);
         carousel.set(0);
         flyWheel.set(0);
-        frDrive.set(ControlMode.PercentOutput, -.2);
-        brDrive.set(ControlMode.PercentOutput, -.2);
+        drive.setPower(0, -0.2);
       }
       else if (time >=6 && time <8) {
-        flDrive.set(ControlMode.PercentOutput, 0);
-        blDrive.set(ControlMode.PercentOutput, 0);
-        frDrive.set(ControlMode.PercentOutput, 0);
-        brDrive.set(ControlMode.PercentOutput, 0);}
+        drive.setPower(0, 0);
+      
         /*flDrive.set(ControlMode.PercentOutput, -.4);
         blDrive.set(ControlMode.PercentOutput, -.4);
         frDrive.set(ControlMode.PercentOutput, -.4);
-        brDrive.set(ControlMode.PercentOutput, -.4);
+        brDrive.set(ControlMode.PercentOutput, -.4);*/
       }
-      else if (time >= 9) {
+      /*else if (time >= 9) {
         flDrive.set(ControlMode.PercentOutput, 0);
         blDrive.set(ControlMode.PercentOutput, 0);
         frDrive.set(ControlMode.PercentOutput, 0);
         brDrive.set(ControlMode.PercentOutput, 0);
       }*/
+      
     }
-    
   }
 
   @Override
@@ -373,10 +364,7 @@ public class Robot extends TimedRobot {
       double right = yOutputSpeed + xOutputSpeed;
 
       //motor output
-      flDrive.set(ControlMode.PercentOutput, left);
-      blDrive.set(ControlMode.PercentOutput, left);
-      frDrive.set(ControlMode.PercentOutput, right);
-      brDrive.set(ControlMode.PercentOutput, right);
+      drive.setPower(left, right);
     }
     else {
       NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(0); //set limelight LED's to default pipeline setting (generally off)
@@ -384,16 +372,7 @@ public class Robot extends TimedRobot {
       double speed = driveStick.getY();
       double turn = driveStick.getZ() * -.7;
 
-      speed = speed * Math.abs(speed);
-      turn = turn * Math.abs(turn);
-
-      double left = speed + turn;
-      double right = speed - turn;
-
-      flDrive.set(ControlMode.PercentOutput, left);
-      blDrive.set(ControlMode.PercentOutput, left);
-      frDrive.set(ControlMode.PercentOutput, right);
-      brDrive.set(ControlMode.PercentOutput, right);
+      drive.arcadeDrive(speed, turn);
     }
   
   
